@@ -1,21 +1,38 @@
 class ForecastsController < ApplicationController
   include AddressHelper
-  include WeatherApiService
 
-  def show
-    @address = params[:address]
-    # @zip_code = params[:zip_code]
-    @zip_code = parse_zip_code(@address)
+  def create
+    @forecast = Forecast.new(forecast_params)
+    @forecast.zip_code = parse_zip_code(@forecast.address)
 
-    unless @zip_code
+    unless @forecast.zip_code
       flash[:error] = "Zip Code must be 5 digits. Please try again."
-      redirect_to root_path
+      redirect_to root_path and return
     end
 
-    # save address and zip code to the database after validation
+    # debugger
+    @forecast.result = get_forecast(@forecast.zip_code)
+    if @forecast.result["error"].nil? && @forecast.save
+      redirect_to @forecast
+    else
+      flash[:error] = @forecast.result["error"]["message"]
+      redirect_to root_path
+    end
+  end
 
-    # call the forecast service
-    response = WeatherApiService.forecast(@address, @zip_code)
+  def show
+    @forecast = Forecast.find(params[:id])
+  end
+
+  private
+
+  def get_forecast(zip_code)
+    weather_api = WeatherApiService.new(zip_code)
+    weather_api.forecast
+  end
+
+  def forecast_params
+    params.require(:forecast).permit(:address, :zip_code, :result)
   end
 end
 
