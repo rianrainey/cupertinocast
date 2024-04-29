@@ -1,24 +1,28 @@
 <%# wrap this in a turbo frame %>
 <h1>Forecast for: <%= @forecast.address %></h1>
 <div>
-  <%= @forecast.result["location"]["name"] %>
-  <%= @forecast.result["location"]["region"] %>
-  <%= @forecast.result["location"]["country"] %>
+  <%= @forecast.result.dig("location", "name") %>
+  <%= @forecast.result.dig("location", "region") %>
+  <%= @forecast.result.dig("location", "country") %>
 </div>
 <br/>
 <div>
   <h2>Current temperature:</h2>
-  F: <%= @forecast.result["current"]["temp_f"] %>
-  C: <%= @forecast.result["current"]["temp_c"] %>
+  F: <%= @forecast.result.dig("current", "temp_f") %>
+  C: <%= @forecast.result.dig("current", "temp_c") %>
 </div>
 <br/>
 <div>
-  <% @forecast.result["forecast"]["forecastday"].each do |day| %>
-    <h2><%= day["date"] %></h2>
-    Max Temp (F): <%= day["day"]["maxtemp_f"] %>
-    Max Temp (C): <%= day["day"]["maxtemp_c"] %>
-    Min Temp (F): <%= day["day"]["mintemp_f"] %>
-    Min Temp (C): <%= day["day"]["mintemp_c"] %>
+  <% if @forecast.result.dig("forecast", "forecastday") %>
+    <% @forecast.result.dig("forecast", "forecastday").each do |day| %>
+      <h2><%= day["date"] %></h2>
+      Max Temp (F): <%= day["day"]["maxtemp_f"] %>
+      Max Temp (C): <%= day["day"]["maxtemp_c"] %>
+      Min Temp (F): <%= day["day"]["mintemp_f"] %>
+      Min Temp (C): <%= day["day"]["mintemp_c"] %>
+    <% end %>
+  <% else %>
+    <p>No forecast data available.</p>
   <% end %>
 </div>
 <br/>

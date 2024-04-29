@@ -3,19 +3,90 @@ require 'rails_helper'
 RSpec.describe 'Forecasts', type: :request do
   describe 'POST /create' do
     let(:success_response) { {'location' => { 'name' => 'Dublin' } } }
+    let(:success_response_api) { {'location' => { 'name' => 'New York' } } }
     let(:error_response) { {'error'=>{'code'=>1002, 'message'=>'API key is invalid or not provided.'}} }
+    let(:now) { Time.zone.now }
+    let(:outdated_time_window) { now - 30.minutes - 1.second }
+    let(:forecast) {
+      create(:forecast,
+        address: '12345',
+        zip_code: '12345',
+        result: success_response
+      )
+    }
 
     context 'when the address is valid' do
-      subject { post '/forecasts', params: { forecast: { address: '94101' } } }
+      subject { post '/forecasts', params: { forecast: { address: '12345' } } }
 
       it 'returns http success' do
+        Timecop.freeze(Time.zone.now)
         allow_any_instance_of(WeatherApiService).to receive(:forecast).and_return(success_response)
         subject
-        expect(response).to have_http_status(:redirect)
-        expect(response).to redirect_to(forecast_path(assigns(:forecast)))
-        expect(assigns(:forecast).address).to eq('94101')
-        expect(assigns(:forecast).zip_code).to eq('94101')
-        expect(assigns(:forecast).last_search_date).to be
+        expect(response).to have_http_status(:success)
+        expect(response).to render_template(:show)
+        expect(assigns(:forecast).address).to eq('12345')
+        expect(assigns(:forecast).zip_code).to eq('12345')
+        expect(assigns(:forecast).last_search_date).to eq(Time.zone.now)
+        expect(assigns(:forecast).result).to eq(success_response)
+        Timecop.return
+      end
+
+      context 'and results are not outdated' do
+        before do
+          forecast.update(last_search_date: now)
+        end
+
+        context 'when the forecast result is in the database' do
+          it 'does not call api' do
+            expect_any_instance_of(WeatherApiService).not_to receive(:forecast)
+            subject
+            expect(response.body).to include('Dublin')
+          end
+        end
+
+        context 'when the forecast result is not in the database' do
+          before do
+            forecast.update(result: nil)
+          end
+
+          it 'calls the api' do
+            expect_any_instance_of(WeatherApiService).to receive(:forecast).and_return(success_response_api)
+            subject
+            expect(response.body).to include('New York')
+          end
+        end
+      end
+
+      context 'zip code results are outdated' do
+        before do
+          forecast.update(last_search_date: outdated_time_window)
+        end
+
+        context 'when the forecast is in the database' do
+          it 'calls the api' do
+            Timecop.freeze(now)
+            expect_any_instance_of(WeatherApiService).to receive(:forecast).and_return(success_response_api)
+            subject
+            expect(response.body).to include('New York')
+            expect(forecast.reload.last_search_date).to eq(now)
+            Timecop.return
+          end
+        end
+
+        context 'when the forecast is not in the database' do
+          before do
+            forecast.update(result: nil)
+          end
+
+          it 'calls the api' do
+            Timecop.freeze(now)
+            expect_any_instance_of(WeatherApiService).to receive(:forecast).and_return(success_response_api)
+            subject
+            expect(response.body).to include('New York')
+            expect(forecast.reload.last_search_date).to eq(now)
+            Timecop.return
+          end
+        end
       end
 
       context 'and the API key is invalid' do
@@ -28,7 +99,7 @@ RSpec.describe 'Forecasts', type: :request do
     end
 
     context 'when address is invalid' do
-      subject { post '/forecasts', params: { forecast: { address: '941011' } } }
+      subject { post '/forecasts', params: { forecast: { address: '1234' } } }
 
       it 'returns http error' do
         subject
@@ -36,34 +107,6 @@ RSpec.describe 'Forecasts', type: :request do
         expect(flash[:error]).to include("Zip Code must be 5 digits")
       end
     end
-
-    context 'zip code results are less than 30 minutes old' do
-      subject { post '/forecasts', params: { forecast: { address: '94101' } } }
-
-      it 'returns from cache and not api' do
-        recent_time_window = Time.zone.now
-        expect_any_instance_of(WeatherApiService).not_to receive(:forecast)
-        forecast = create(:forecast, address: '94101', zip_code: '94101', last_search_date: Time.zone.now, result: success_response)
-        subject
-        expect(response).to have_http_status(:redirect)
-        expect(response).to redirect_to(forecast_path(assigns(:forecast)))
-      end
-    end
-
-    context 'and searched more than 30 minutes ago' do
-      it 'returns from api and not cache' do
-        now = Time.now
-        expect_any_instance_of(WeatherApiService).to receive(:forecast)
-        forecast = create(:forecast, address: '94101', zip_code: '94101', last_search_date: Time.now - 30.minutes - 1.second)
-        subject
-        debugger
-        expect(response).to have_http_status(:redirect)
-        expect(response).to redirect_to(forecast_path(assigns(:forecast)))
-        # it updates last_search_date
-        expect(forecast.last_search_date).to be(now)
-      end
-    end
-
 
   end
 end

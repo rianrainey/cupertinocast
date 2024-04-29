@@ -3,23 +3,30 @@ class ForecastsController < ApplicationController
 
   def create
     zip_code = parse_zip_code(params[:forecast][:address])
-
-    if invalid_zip_code?(zip_code)
+    if zip_code.blank?
+      flash[:error] = "Zip Code must be 5 digits. Please try again."
       redirect_to root_path and return
     end
 
     @forecast = Forecast.find_or_initialize_by(zip_code: zip_code, address: forecast_params[:address])
+    # debugger
 
-    if @forecast.retrieve_from_api?
+    if @forecast.outdated? || @forecast.result.nil?
       @forecast.result = get_forecast(@forecast.zip_code)
+      @forecast.last_search_date = Time.zone.now
+    # else
+    #   raise StandardError, "Couldn't find or initialize by zip code"
     end
 
-    if @forecast.result["error"].nil?
-      @forecast.last_search_date = Time.now
-      @forecast.save
-      redirect_to @forecast
-    else
+    if @forecast.result&.key?('error')
       flash[:error] = @forecast.result["error"]["message"]
+      redirect_to root_path and return
+    end
+
+    if @forecast.save || @forecast.result.present?
+      render :show
+    else
+      flash[:error] = "Something went wrong. Please try again."
       redirect_to root_path
     end
   end
@@ -42,12 +49,6 @@ class ForecastsController < ApplicationController
       :result,
       :last_search_date,
     )
-  end
-
-  def invalid_zip_code?(zip_code)
-   if zip_code.blank?
-      flash[:error] = "Zip Code must be 5 digits. Please try again."
-    end
   end
 end
 
