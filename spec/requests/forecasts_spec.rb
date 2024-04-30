@@ -119,5 +119,13 @@ RSpec.describe 'Forecasts', type: :request do
     end
 
   end
+
+  describe 'GET /new' do
+    it 'returns http success' do
+      get '/forecasts/new'
+      expect(response).to have_http_status(:success)
+      expect(response.body).to include('Enter an address containing a zip code')
+    end
+  end
 end
 
