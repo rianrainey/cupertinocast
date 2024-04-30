@@ -1,24 +1,22 @@
-# README
+# Cupertino Cast
 
-This README would normally document whatever steps are necessary to get the
-application up and running.
+This is a weather forecast app made for Apple Inc. It uses the WeatherApi.com API to fetch the weather data.
 
-Things you may want to cover:
+## Prerequisites
 
-* Ruby version
+- Ruby
+- Make sure you have the `master.key` that I emailed the recruiter so you can access the WeatherApi key.
 
-* System dependencies
+## Setup
 
-* Configuration
+```
+git clone https://github.com/rianrainey/cupertinocast.git
+cd cupertinocast
+bundle install
+./bin/setup
+./bin/dev
+```
 
-* Database creation
+## Troubleshooting
 
-* Database initialization
-
-* How to run the test suite
-
-* Services (job queues, cache servers, search engines, etc.)
-
-* Deployment instructions
-
-* ...
+If you can't access the weather_api key, you can create your own key on the [WeatherApi website](https://weatherapi.com/) and update `config/credentials/development.yml.enc` with the new key.
