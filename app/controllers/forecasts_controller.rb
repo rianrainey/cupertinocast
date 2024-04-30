@@ -8,7 +8,6 @@ class ForecastsController < ApplicationController
       redirect_to root_path and return
     end
 
-    # debugger
     @forecast = Forecast.find_or_initialize_by(zip_code: zip_code, address: forecast_params[:address])
 
     if @forecast.outdated? || @forecast.result.nil?
