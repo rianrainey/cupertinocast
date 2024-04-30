@@ -1,0 +1,10 @@
+<%# frozen_string_literal: true %>
+<%= simple_form_for @forecast, html: { class: 'form' } do |f| %>
+  <% if @forecast.errors.any? %>
+    <div class="error-message">
+      <%= @forecast.errors.full_messages.to_sentence.capitalize %>
+    </div>
+  <% end %>
+  <%= f.input :address, placeholder: 'Enter an address containing a zip code', input_html: { autofocus: true }, style: 'width:22em;' %>
+  <%= f.button :submit, class: 'btn btn--primary' %>
+<% end %>

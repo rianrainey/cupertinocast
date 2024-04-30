@@ -1,5 +1,5 @@
-<%# wrap this in a turbo frame %>
-<h1>Forecast for: <%= @forecast.address %></h1>
+<%= link_to 'New Forecast', new_forecast_path, class: 'btn btn--primary' %>
+<h1 class="mt-8">Forecast for: <%= @forecast.address %></h1>
 <div>
   <%= @forecast.result.dig("location", "name") %>
   <%= @forecast.result.dig("location", "region") %>
@@ -7,22 +7,41 @@
 </div>
 <br/>
 <div>
-  <h2>Current temperature:</h2>
-  F: <%= @forecast.result.dig("current", "temp_f") %>
+  <h2>Current Temperature:</h2>
+  F: <%= @forecast.result.dig("current", "temp_f") %><br/>
   C: <%= @forecast.result.dig("current", "temp_c") %>
 </div>
 <br/>
-<div>
-  <% if @forecast.result.dig("forecast", "forecastday") %>
+<%# <div class='flex min-h-screen items-center justify-center min-h-screen from-purple-200 via-purple-300 to-purple-500 bg-gradient-to-br'>
+  <div class="flex items-center justify-center min-h-[450px]">
+    <div class="overflow-x-auto relative shadow-md sm:rounded-lg">
+      <div class="overflow-x-auto relative shadow-md sm:rounded-lg"> %>
+<% if @forecast.result.dig("forecast", "forecastday") %>
+  <table class="table-auto">
+    <thead>
+      <tr>
+        <th scope="col" class="py-3 px-6">Day</th>
+        <th scope="col" class="py-3 px-6">Max Temp (F)</th>
+        <th scope="col" class="py-3 px-6">Max Temp (C)</th>
+        <th scope="col" class="py-3 px-6">Min Temp (F)</th>
+        <th scope="col" class="py-3 px-6">Min Temp (C)</th>
+      </tr>
+    </thead>
     <% @forecast.result.dig("forecast", "forecastday").each do |day| %>
-      <h2><%= day["date"] %></h2>
-      Max Temp (F): <%= day["day"]["maxtemp_f"] %>
-      Max Temp (C): <%= day["day"]["maxtemp_c"] %>
-      Min Temp (F): <%= day["day"]["mintemp_f"] %>
-      Min Temp (C): <%= day["day"]["mintemp_c"] %>
+      <tr>
+        <td class="py-4 px-6"><%= day["date"] %></td>
+        <td class="py-4 px-6"><%= day["day"]["maxtemp_f"] %></td>
+        <td class="py-4 px-6"><%= day["day"]["maxtemp_c"] %></td>
+        <td class="py-4 px-6"><%= day["day"]["mintemp_f"] %></td>
+        <td class="py-4 px-6"><%= day["day"]["mintemp_c"] %></td>
+      </tr>
     <% end %>
-  <% else %>
-    <p>No forecast data available.</p>
-  <% end %>
+  </table>
+  <%# </div>
 </div>
-<br/>
+</div>
+</div>
+</div> %>
+<% else %>
+  <p>No forecast data available.</p>
+<% end %>

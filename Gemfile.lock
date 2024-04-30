@@ -107,8 +107,13 @@ GEM
     factory_bot_rails (6.4.3)
       factory_bot (~> 6.4)
       railties (>= 5.0.0)
+    ffi (1.16.3)
     globalid (1.2.1)
       activesupport (>= 6.1)
+    hotwire-livereload (1.4.0)
+      actioncable (>= 6.0.0)
+      listen (>= 3.0.0)
+      railties (>= 6.0.0)
     httparty (0.21.0)
       mini_mime (>= 1.0.0)
       multi_xml (>= 0.5.2)
@@ -125,6 +130,9 @@ GEM
     jbuilder (2.11.5)
       actionview (>= 5.0.0)
       activesupport (>= 5.0.0)
+    listen (3.9.0)
+      rb-fsevent (~> 0.10, >= 0.10.3)
+      rb-inotify (~> 0.9, >= 0.9.10)
     loofah (2.22.0)
       crass (~> 1.0.2)
       nokogiri (>= 1.12.0)
@@ -211,6 +219,9 @@ GEM
       thor (~> 1.0, >= 1.2.2)
       zeitwerk (~> 2.6)
     rake (13.2.1)
+    rb-fsevent (0.11.2)
+    rb-inotify (0.10.1)
+      ffi (~> 1.0)
     rdoc (6.6.3.1)
       psych (>= 4.0.0)
     redis (5.2.0)
@@ -239,6 +250,8 @@ GEM
       rspec-support (~> 3.13)
     rspec-support (3.13.1)
     rubyzip (2.3.2)
+    sassc (2.4.0)
+      ffi (~> 1.9)
     selenium-webdriver (4.19.0)
       base64 (~> 0.2)
       rexml (~> 3.2, >= 3.2.5)
@@ -305,6 +318,7 @@ DEPENDENCIES
   capybara
   debug
   factory_bot_rails
+  hotwire-livereload
   httparty
   importmap-rails
   jbuilder
@@ -314,6 +328,7 @@ DEPENDENCIES
   rails-controller-testing
   redis (>= 4.0.1)
   rspec-rails
+  sassc
   selenium-webdriver
   simple_form
   sprockets-rails

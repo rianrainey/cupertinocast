@@ -8,14 +8,16 @@ class ForecastsController < ApplicationController
       redirect_to root_path and return
     end
 
-    @forecast = Forecast.find_or_initialize_by(zip_code: zip_code, address: forecast_params[:address])
     # debugger
+    @forecast = Forecast.find_or_initialize_by(zip_code: zip_code, address: forecast_params[:address])
 
     if @forecast.outdated? || @forecast.result.nil?
       @forecast.result = get_forecast(@forecast.zip_code)
       @forecast.last_search_date = Time.zone.now
-    # else
-    #   raise StandardError, "Couldn't find or initialize by zip code"
+    elsif @forecast.result.present?
+      flash[:notice] = "Results are cached from the last 30 minutes."
+    else
+      raise StandardError, "Error retrieving weather data"
     end
 
     if @forecast.result&.key?('error')
@@ -24,7 +26,7 @@ class ForecastsController < ApplicationController
     end
 
     if @forecast.save || @forecast.result.present?
-      render :show
+      redirect_to @forecast
     else
       flash[:error] = "Something went wrong. Please try again."
       redirect_to root_path
@@ -33,6 +35,10 @@ class ForecastsController < ApplicationController
 
   def show
     @forecast = Forecast.find(params[:id])
+  end
+
+  def new
+    @forecast = Forecast.new
   end
 
   private

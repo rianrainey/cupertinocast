@@ -6,6 +6,7 @@ ruby "3.3.0"
 gem "rails", "~> 7.1.3", ">= 7.1.3.2"
 gem "simple_form"
 gem "httparty"
+gem "sassc"
 
 # The original asset pipeline for Rails [https://github.com/rails/sprockets-rails]
 gem "sprockets-rails"
@@ -56,6 +57,7 @@ group :development, :test do
   gem "rails-controller-testing"
   gem "timecop"
   gem "factory_bot_rails"
+  gem "hotwire-livereload"
 end
 
 group :development do
