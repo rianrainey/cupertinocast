@@ -16,7 +16,7 @@ RSpec.describe 'Home', type: :request do
       get '/'
       # submit bad text in form
       post '/forecasts', params: { forecast: { address: '1234567890' } }
-      expect(flash[:error]).to include('Zip Code must be 5 digits')
+      expect(flash[:error]).to include('Address must contain a zip code with 5 digits')
       # expect(response.body).to include('Zip Code must be 5 digits')
     end
   end

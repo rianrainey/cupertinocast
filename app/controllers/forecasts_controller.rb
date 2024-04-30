@@ -4,7 +4,7 @@ class ForecastsController < ApplicationController
   def create
     zip_code = parse_zip_code(params[:forecast][:address])
     if zip_code.blank?
-      flash[:error] = "Zip Code must be 5 digits. Please try again."
+      flash[:error] = "Address must contain a zip code with 5 digits"
       redirect_to root_path and return
     end
 

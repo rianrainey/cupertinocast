@@ -114,7 +114,7 @@ RSpec.describe 'Forecasts', type: :request do
       it 'returns http error' do
         subject
         expect(response).to redirect_to(root_path)
-        expect(flash[:error]).to include("Zip Code must be 5 digits")
+        expect(flash[:error]).to include("Address must contain a zip code with 5 digits")
       end
     end
 
