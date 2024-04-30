@@ -2,6 +2,10 @@
 
 This is a weather forecast app made for Apple Inc. It uses the WeatherApi.com API to fetch the weather data.
 
+<img width="400" alt="Screenshot 2024-04-30 at 3 57 53 PM" src="https://github.com/rianrainey/cupertinocast/assets/523354/ed40da09-b1ad-486a-8a7f-55bc66d649c6">
+
+
+
 ## Prerequisites
 
 - Ruby
